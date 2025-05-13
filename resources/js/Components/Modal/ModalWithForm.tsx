@@ -10,11 +10,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useForm } from "@inertiajs/react";
 import { FormEventHandler, useState } from "react";
+import { Button } from "../ui/button";
 
 export function ModalWithForm() {
     const [open, setOpen] = useState(false);

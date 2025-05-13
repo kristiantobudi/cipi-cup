@@ -8,12 +8,15 @@ use App\Models\Inventory\Categories;
 
 class CategoriesController extends Controller
 {
-     public function index(Request $request)
+    public function index(Request $request)
     {
         $categories = Categories::latest()->get();
 
-        return inertia('Inventory/Categories/Categories');
+        return inertia('Inventory/Categories/Categories', [
+            'categories' => $categories,
+        ]);
     }
+
 
     public function store(Request $request)
     {

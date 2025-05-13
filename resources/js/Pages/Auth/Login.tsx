@@ -2,7 +2,7 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { cn } from "@/lib/utils";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { GalleryVerticalEnd, LogsIcon } from "lucide-react";
 import { FormEventHandler } from "react";
 import LoginImage from "@/Assets/login.jpg";
