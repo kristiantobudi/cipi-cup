@@ -4,6 +4,7 @@ import {
     createNumberColumn,
     createSelectionColumn,
     createSelectionColumnName,
+    createSizeColumnWithBadge,
     createSortableHeader,
     createStatusColumn,
     DataTable,
@@ -11,7 +12,9 @@ import {
 import { DatePicker } from "@/Components/DatePicker";
 import Dropdown from "@/Components/Dropdown";
 import { CustomsModal } from "@/Components/Modal/ModalWithForm";
+import { SelectComponent } from "@/Components/Select/Select";
 import TableData from "@/Components/TableData";
+import { TextareaWithLabel } from "@/Components/TextArea/TextAreaWithLabel";
 import { CardContent } from "@/Components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -48,91 +51,87 @@ type MetricData = {
     id: string;
     name: string;
     category: string;
-    value: number;
+    product_id: string;
+    type: string;
+    price: number;
     previousValue: number;
     change: number;
     status: string;
     lastUpdated: string | Date;
     trend: number[];
-    category_id: string;
-    sku: string;
+    quantity: number;
 };
 
-type Category = {
-    id: string;
-    name: string;
-};
-
-export default function Products() {
-    const product: { name: string; createdAt: string }[] =
-        usePage().props.products;
-    const categories = (usePage().props.categories ?? []) as {
+export default function StockPage() {
+    // Show Product
+    const products = (usePage().props.products ?? []) as {
         id: string;
         name: string;
         created_at: string;
     }[];
-    const categoryMap = Object.fromEntries(
-        categories.map((p) => [p.id, p.name])
-    );
+    const productMap = Object.fromEntries(products.map((p) => [p.id, p.name]));
+    // Show Stock
+    const stock = (usePage().props.stock ?? []) as {
+        id: string;
+        name: string;
+        created_at: string;
+    }[];
+
     const [visibleCount, setVisibleCount] = useState(10);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [type, setType] = useState("");
 
+    // Enum Type
+    const typeEnum = ["in", "out"] as const;
+    const typeOptions = typeEnum.map((type) => ({
+        label: type.charAt(0).toUpperCase() + type.slice(1),
+        value: type,
+    }));
+
+    // to Scroll from scroll area
     const handleScroll = () => {
         const el = scrollRef.current;
         if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
             // Near bottom, load 10 more items
-            setVisibleCount((prev) => Math.min(prev + 10, categories.length));
+            setVisibleCount((prev) => Math.min(prev + 10, products.length));
         }
     };
 
     // Reset visibleCount if categories change
     useEffect(() => {
         setVisibleCount(10);
-    }, [categories]);
-    // const columns = [
-    //     // {
-    //     //     key: "index",
-    //     //     label: "No",
-    //     //     render: (_value: any, _row: any, index: any) => index + 1,
-    //     // },
-    //     {
-    //         key: "name",
-    //         label: "Category Name",
-    //     },
-    //     {
-    //         key: "created_at",
-    //         label: "Created At",
-    //         render: (val: any) => new Date(val).toLocaleDateString(),
-    //     },
-    // ];
+    }, [products]);
 
     const columns = [
         createSelectionColumn<MetricData>(),
         {
-            accessorKey: "name",
-            header: createSortableHeader<MetricData>("Product Name", "name"),
+            accessorKey: "product_id",
+            header: createSortableHeader<MetricData>(
+                "Product Name",
+                "product_id"
+            ),
+            cell: ({ row }) => {
+                const productId = row.getValue("product_id") as string;
+                const productName = productMap[productId] || "Unknown";
+                return <div className="font-medium">{productName}</div>;
+            },
+        },
+        createSizeColumnWithBadge<MetricData>("Stock In/Out", "type"),
+        {
+            accessorKey: "quantity",
+            header: createSortableHeader<MetricData>("Quantity", "quantity"),
             cell: ({ row }) => {
                 return (
-                    <div className="font-medium">{row.getValue("name")}</div>
+                    <div className="font-medium">
+                        {row.getValue("quantity")}
+                    </div>
                 );
             },
         },
-        {
-            accessorKey: "sku",
-            header: createSortableHeader<MetricData>("SKU", "sku"),
-            cell: ({ row }) => {
-                return <div className="font-medium">{row.getValue("sku")}</div>;
-            },
-        },
-        {
-            accessorKey: "category_id",
-            header: createSortableHeader<MetricData>("Category", "category_id"),
-            cell: ({ row }) => {
-                const categoryId = row.getValue("category_id") as string;
-                const categoryName = categoryMap[categoryId] || "Unknown";
-                return <div className="font-medium">{categoryName}</div>;
-            },
-        },
+        createNumberColumn<MetricData>("Price", "price", {
+            decimals: 2,
+            prefix: "Rp ",
+        }),
         {
             accessorKey: "created_at",
             header: "Tanggal Pembuatan",
@@ -151,126 +150,6 @@ export default function Products() {
             },
         },
 
-        // createSelectionColumnName<MetricData>("Metric Name", "name"),
-        // {
-        //     accessorKey: "category",
-        //     header: "Category",
-        //     cell: ({ row }) => {
-        //         const category = row.getValue("category") as string;
-        //         return (
-        //             <div className="flex items-center">
-        //                 {category === "Sales" && (
-        //                     <BarChart className="mr-2 h-4 w-4 text-primary opacity-70" />
-        //                 )}
-        //                 {category === "Marketing" && (
-        //                     <TrendingUp className="mr-2 h-4 w-4 text-secondary opacity-70" />
-        //                 )}
-        //                 {category === "Web Analytics" && (
-        //                     <Activity className="mr-2 h-4 w-4 text-primary opacity-70" />
-        //                 )}
-        //                 {category === "Customer" && (
-        //                     <Users className="mr-2 h-4 w-4 text-secondary opacity-70" />
-        //                 )}
-        //                 {category}
-        //             </div>
-        //         );
-        //     },
-        // },
-        // createNumberColumn<MetricData>("Current Value", "value", {
-        //     decimals: 2,
-        //     suffix: (row) => {
-        //         const name = row.name.toLowerCase();
-        //         if (name.includes("rate") || name.includes("satisfaction"))
-        //             return "%";
-        //         if (name.includes("time")) return "s";
-        //         if (
-        //             name.includes("cost") ||
-        //             name.includes("value") ||
-        //             name.includes("revenue")
-        //         )
-        //             return "$";
-        //         return "";
-        //     },
-        // }),
-
-        // {
-        //     accessorKey: "change",
-        //     header: "Change",
-        //     cell: ({ row }) => {
-        //         const change = row.getValue("change") as number;
-        //         const isPositive = change > 0;
-        //         const isNegative = change < 0;
-        //         const isImprovement =
-        //             row.original.name.toLowerCase().includes("cost") ||
-        //             row.original.name.toLowerCase().includes("bounce") ||
-        //             row.original.name.toLowerCase().includes("abandonment") ||
-        //             row.original.name.toLowerCase().includes("time")
-        //                 ? !isPositive
-        //                 : isPositive;
-
-        //         return (
-        //             <div
-        //                 className={`flex items-center ${
-        //                     isImprovement
-        //                         ? "text-green-600 dark:text-green-500"
-        //                         : "text-red-600 dark:text-red-500"
-        //                 }`}
-        //             >
-        //                 {isPositive ? (
-        //                     <ArrowUpRight className="mr-1 h-4 w-4" />
-        //                 ) : isNegative ? (
-        //                     <ArrowDownRight className="mr-1 h-4 w-4" />
-        //                 ) : null}
-        //                 <span>{Math.abs(change).toFixed(1)}%</span>
-        //             </div>
-        //         );
-        //     },
-        // },
-        // {
-        //     accessorKey: "trend",
-        //     header: "Trend",
-        //     cell: ({ row }) => {
-        //         const trend = row.getValue("trend") as number[];
-        //         const min = Math.min(...trend);
-        //         const max = Math.max(...trend);
-        //         const range = max - min;
-
-        //         return (
-        //             <div className="w-24 h-8 flex items-end">
-        //                 {trend.map((value, index) => {
-        //                     const height =
-        //                         range === 0
-        //                             ? 50
-        //                             : ((value - min) / range) * 100;
-        //                     const isLast = index === trend.length - 1;
-
-        //                     return (
-        //                         <div
-        //                             key={index}
-        //                             className={`w-3 mx-0.5 rounded-t-sm ${
-        //                                 isLast ? "bg-primary" : "bg-primary/30"
-        //                             }`}
-        //                             style={{
-        //                                 height: `${Math.max(10, height)}%`,
-        //                             }}
-        //                         />
-        //                     );
-        //                 })}
-        //             </div>
-        //         );
-        //     },
-        // },
-        // createStatusColumn<MetricData>("Status", "status", {
-        //     improved: { label: "Improved", variant: "default" },
-        //     declined: { label: "Declined", variant: "destructive" },
-        //     unchanged: { label: "Unchanged", variant: "secondary" },
-        // }),
-        // createDateColumn<MetricData>("Last Updated", "lastUpdated", {
-        //     month: "short",
-        //     day: "numeric",
-        //     hour: "2-digit",
-        //     minute: "2-digit",
-        // }),
         createActionsColumn<MetricData>([
             {
                 label: "View Details",
@@ -342,111 +221,101 @@ export default function Products() {
                     <div className="overflow-hidden bg-primary-foreground shadow-sm sm:rounded-lg">
                         <div className="flex items-center justify-between">
                             <div className="p-6 text-gray-900 font-bold text-2xl">
-                                Categories
+                                Stock
                             </div>
                             <div className="p-6">
                                 <CustomsModal
                                     title="Create New Product"
                                     triggerLabel="Add Product"
-                                    routeName="product.store"
+                                    routeName="stock.store"
                                     defaultData={{
-                                        name: "",
-                                        sku: "",
-                                        stock: "",
-                                        min_stock: "",
-                                        category_id: "",
+                                        type: "",
+                                        quantity: "",
+                                        price: "",
+                                        description: "",
+                                        product_id: "",
                                         users_id: "",
                                     }}
                                     renderFields={(data, setData, errors) => (
                                         <>
                                             <div className="space-y-2">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <Input
-                                                        id="name"
-                                                        name="name"
+                                                <SelectComponent
+                                                    label="Stock Type"
+                                                    placeholder="Select stock type"
+                                                    items={typeOptions}
+                                                    value={type}
+                                                    onChange={(value) => {
+                                                        setType(value);
+                                                        setData("type", value);
+                                                    }}
+                                                />
+                                                {/* <Input
+                                                        id="type"
+                                                        name="type"
                                                         type="text"
-                                                        value={data.name}
+                                                        value={data.type}
                                                         onChange={(e) =>
                                                             setData(
                                                                 "name",
                                                                 e.target.value
                                                             )
                                                         }
-                                                        placeholder="Product Name"
+                                                        placeholder="Type"
                                                         className="p-2"
                                                         required
-                                                    />
-                                                    {errors.name && (
+                                                    /> */}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {errors.type && (
                                                         <p className="text-sm text-red-500 mt-1">
-                                                            {errors.name}
+                                                            {errors.type}
                                                         </p>
                                                     )}
                                                     <Input
-                                                        id="sku"
-                                                        name="sku"
-                                                        type="text"
-                                                        value={data.sku}
-                                                        onChange={(e) =>
-                                                            setData(
-                                                                "sku",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder="SKU"
-                                                        className="p-2"
-                                                        required
-                                                    />
-                                                    {errors.sku && (
-                                                        <p className="text-sm text-red-500 mt-1">
-                                                            {errors.sku}
-                                                        </p>
-                                                    )}
-                                                    <Input
-                                                        id="stock"
-                                                        name="stock"
+                                                        id="quantity"
+                                                        name="quantity"
                                                         type="number"
-                                                        value={data.stock}
+                                                        value={data.quantity}
                                                         onChange={(e) =>
                                                             setData(
-                                                                "stock",
+                                                                "quantity",
                                                                 e.target.value
                                                             )
                                                         }
-                                                        placeholder="Stock"
+                                                        placeholder="Quantity"
                                                         className="p-2"
                                                         required
                                                     />
-                                                    {errors.stock && (
+                                                    {errors.quantity && (
                                                         <p className="text-sm text-red-500 mt-1">
-                                                            {errors.stock}
+                                                            {errors.quantity}
                                                         </p>
                                                     )}
                                                     <Input
-                                                        id="min_stock"
-                                                        name="min_stock"
+                                                        id="price"
+                                                        name="price"
                                                         type="number"
-                                                        value={data.min_stock}
+                                                        value={data.price}
                                                         onChange={(e) =>
                                                             setData(
-                                                                "min_stock",
+                                                                "price",
                                                                 e.target.value
                                                             )
                                                         }
-                                                        placeholder="Stock minimum"
+                                                        placeholder="Price"
                                                         className="p-2"
                                                         required
                                                     />
-                                                    {errors.min_stock && (
+                                                    {errors.price && (
                                                         <p className="text-sm text-red-500 mt-1">
-                                                            {errors.min_stock}
+                                                            {errors.price}
                                                         </p>
                                                     )}
                                                 </div>
                                                 <Select
-                                                    value={data.category_id}
+                                                    value={data.products_id}
                                                     onValueChange={(value) =>
                                                         setData(
-                                                            "category_id",
+                                                            "product_id",
                                                             value
                                                         )
                                                     }
@@ -457,7 +326,7 @@ export default function Products() {
                                                     <SelectContent>
                                                         <SelectGroup>
                                                             <SelectLabel>
-                                                                Categories
+                                                                Products
                                                             </SelectLabel>
                                                             <ScrollArea
                                                                 ref={scrollRef}
@@ -466,25 +335,25 @@ export default function Products() {
                                                                     handleScroll
                                                                 }
                                                             >
-                                                                {categories
+                                                                {products
                                                                     .slice(
                                                                         0,
                                                                         visibleCount
                                                                     )
                                                                     .map(
                                                                         (
-                                                                            category
+                                                                            product
                                                                         ) => (
                                                                             <SelectItem
                                                                                 key={
-                                                                                    category.id
+                                                                                    product.id
                                                                                 }
                                                                                 value={
-                                                                                    category.id
+                                                                                    product.id
                                                                                 }
                                                                             >
                                                                                 {
-                                                                                    category.name
+                                                                                    product.name
                                                                                 }
                                                                             </SelectItem>
                                                                         )
@@ -493,32 +362,20 @@ export default function Products() {
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
-                                                {errors.category_id && (
+                                                {errors.product_id && (
                                                     <p className="text-sm text-red-500 mt-1">
-                                                        {errors.category_id}
+                                                        {errors.product_id}
                                                     </p>
                                                 )}
+                                                <TextareaWithLabel
+                                                    key={data.description}
+                                                />
                                                 <DatePicker key={data.date} />
                                                 {errors.date && (
                                                     <p className="text-sm text-red-500 mt-1">
                                                         {errors.date}
                                                     </p>
                                                 )}
-                                                {/* <Input
-                                                    id="date"
-                                                    name="date"
-                                                    type="date"
-                                                    value={data.date}
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "name",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    placeholder="Tanggal"
-                                                    className="p-2"
-                                                    required
-                                                /> */}
                                             </div>
                                         </>
                                     )}
@@ -537,7 +394,7 @@ export default function Products() {
                             <CardContent className="pt-6">
                                 <DataTable
                                     columns={columns}
-                                    data={product as any[]}
+                                    data={stock as any[]}
                                     searchKey="name"
                                     searchPlaceholder="Search metrics..."
                                     exportData={true}

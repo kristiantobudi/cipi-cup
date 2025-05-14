@@ -74,7 +74,7 @@ const data = {
                 },
                 {
                     title: "Stock",
-                    url: "#",
+                    url: route("stock.index"),
                 },
             ],
         },

@@ -174,20 +174,18 @@ export function createSizeColumnWithBadge<T>(
         cell: ({ row }) => {
             const size = row.getValue(accessor as string) as string;
 
-            const sizeColorMap: Record<
-                string,
-                "default" | "secondary" | "destructive" | "outline" | "ternary"
-            > = {
-                S: "secondary",
-                M: "destructive",
-                L: "default",
-                XL: "outline",
-                XXL: "ternary",
+            const sizeColorMap: Record<string, "default" | "secondary"> = {
+                in: "secondary",
+                out: "destructive",
             };
 
             const variant = sizeColorMap[size] || "default";
 
-            return <Badge variant={variant}>{size}</Badge>;
+            return (
+                <Badge className="uppercase" variant={variant}>
+                    {size}
+                </Badge>
+            );
         },
     };
 }
@@ -366,7 +364,7 @@ export function createNumberColumn<T>(
                     : suffix ?? "";
 
             return (
-                <div className="text-right font-mono">
+                <div className="font-mono">
                     {prefix}
                     {formatted}
                     {resolvedSuffix}

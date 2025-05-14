@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Inventory\CategoriesController;
 use App\Http\Controllers\Inventory\ProductController;
+use App\Http\Controllers\Inventory\StockController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -25,6 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/inventory/categories', [CategoriesController::class, 'store'])->name('Categories.store');
     Route::get('/inventory/product', [ProductController::class, 'index'])->name('product.index');
     Route::post('/inventory/product', [ProductController::class, 'store'])->name('product.store');
+    Route::get('/inventory/stock', [StockController::class, 'index'])->name('stock.index');
+    Route::post('/inventory/stock', [StockController::class, 'store'])->name('stock.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -33,4 +36,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
