@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Inventory\CategoriesController;
+use App\Http\Controllers\Inventory\ProductController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -22,6 +23,8 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/inventory/categories', [CategoriesController::class, 'index'])->name('categories.index');
     Route::post('/inventory/categories', [CategoriesController::class, 'store'])->name('Categories.store');
+    Route::get('/inventory/product', [ProductController::class, 'index'])->name('product.index');
+    Route::post('/inventory/product', [ProductController::class, 'store'])->name('product.store');
 });
 
 Route::middleware('auth')->group(function () {

@@ -10,24 +10,37 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
 import { useForm } from "@inertiajs/react";
 import { FormEventHandler, useState } from "react";
 import { Button } from "../ui/button";
 
-export function ModalWithForm() {
-    const [open, setOpen] = useState(false);
+interface CustomModalProps {
+    title: string;
+    triggerLabel?: string;
+    routeName: string;
+    defaultData: { [key: string]: any };
+    renderFields: (
+        data: any,
+        setData: (field: string, value: any) => void,
+        errors: Record<string, string>
+    ) => JSX.Element;
+}
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: "",
-    });
+export function CustomsModal({
+    title,
+    triggerLabel = "Show Dialog",
+    routeName,
+    defaultData,
+    renderFields,
+}: CustomModalProps) {
+    const [open, setOpen] = useState(false);
+    const { data, setData, post, processing, errors, reset } =
+        useForm(defaultData);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route("Categories.store"), {
-            // close the modal
+        post(route(routeName), {
             onSuccess: () => {
                 setOpen(false);
                 reset();
@@ -40,40 +53,30 @@ export function ModalWithForm() {
             <AlertDialogTrigger asChild>
                 <Button onClick={() => setOpen(true)}>
                     <PlusCircleIcon className="h-4 w-4 mr-2" />
-                    Show Dialog
+                    {triggerLabel}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Create new category</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        <Input
-                            id="name"
-                            name="name"
-                            type="text"
-                            value={data.name}
-                            onChange={(e) => setData("name", e.target.value)}
-                            placeholder="Category Name"
-                        />
-                        {errors.name && (
-                            <p className="text-sm text-red-500 mt-1">
-                                {errors.name}
-                            </p>
-                        )}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setOpen(false)}>
-                        Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                        type="submit"
-                        onClick={submit}
-                        disabled={processing}
-                    >
-                        Create
-                    </AlertDialogAction>
-                </AlertDialogFooter>
+                <form onSubmit={submit}>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{title}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <div className="pb-4">
+                                {renderFields(data, setData, errors)}
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setOpen(false)}>
+                            Cancel
+                        </AlertDialogCancel>
+                        <Button type="submit" disabled={processing}>
+                            Create
+                        </Button>
+                        {/* <AlertDialogAction type="submit" disabled={processing}>
+                        </AlertDialogAction> */}
+                    </AlertDialogFooter>
+                </form>
             </AlertDialogContent>
         </AlertDialog>
     );

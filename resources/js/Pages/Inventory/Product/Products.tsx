@@ -8,9 +8,22 @@ import {
     createStatusColumn,
     DataTable,
 } from "@/Components/Advanced-Table";
+import Dropdown from "@/Components/Dropdown";
 import { CustomsModal } from "@/Components/Modal/ModalWithForm";
+import TableData from "@/Components/TableData";
 import { CardContent } from "@/Components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    SelectTrigger,
+    SelectValue,
+    Select,
+    SelectContent,
+    SelectLabel,
+    SelectItem,
+    SelectGroup,
+} from "@/Components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import DefaultLayout from "@/Layouts/DefaultLayout";
 import { usePage } from "@inertiajs/react";
 import {
@@ -28,6 +41,7 @@ import {
     TrendingUp,
     Users,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type MetricData = {
     id: string;
@@ -41,10 +55,34 @@ type MetricData = {
     trend: number[];
 };
 
-export default function Categories() {
-    const categories: { name: string; createdAt: string }[] =
-        usePage().props.categories;
+type Category = {
+    id: string;
+    name: string;
+};
 
+export default function Products() {
+    const product: { name: string; createdAt: string }[] =
+        usePage().props.products;
+    const categories = (usePage().props.categories ?? []) as {
+        id: string;
+        name: string;
+        created_at: string;
+    }[];
+    const [visibleCount, setVisibleCount] = useState(10);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    const handleScroll = () => {
+        const el = scrollRef.current;
+        if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+            // Near bottom, load 10 more items
+            setVisibleCount((prev) => Math.min(prev + 10, categories.length));
+        }
+    };
+
+    // Reset visibleCount if categories change
+    useEffect(() => {
+        setVisibleCount(10);
+    }, [categories]);
     // const columns = [
     //     // {
     //     //     key: "index",
@@ -288,30 +326,198 @@ export default function Categories() {
                                 <CustomsModal
                                     title="Create New Category"
                                     triggerLabel="Add Category"
-                                    routeName="Categories.store"
-                                    defaultData={{ name: "" }}
+                                    routeName="product.store"
+                                    defaultData={{
+                                        name: "",
+                                        sku: "",
+                                        stock: "",
+                                        min_stock: "",
+                                        category_id: "",
+                                        users_id: "",
+                                    }}
                                     renderFields={(data, setData, errors) => (
                                         <>
-                                            <Input
-                                                id="name"
-                                                name="name"
-                                                type="text"
-                                                value={data.name}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Category Name"
-                                                className="p-2"
-                                                required
-                                            />
-                                            {errors.name && (
-                                                <p className="text-sm text-red-500 mt-1">
-                                                    {errors.name}
-                                                </p>
-                                            )}
+                                            <div className="space-y-2">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <Input
+                                                        id="name"
+                                                        name="name"
+                                                        type="text"
+                                                        value={data.name}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "name",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Product Name"
+                                                        className="p-2"
+                                                        required
+                                                    />
+                                                    {errors.name && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                            {errors.name}
+                                                        </p>
+                                                    )}
+                                                    <Input
+                                                        id="sku"
+                                                        name="sku"
+                                                        type="text"
+                                                        value={data.sku}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "sku",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="SKU"
+                                                        className="p-2"
+                                                        required
+                                                    />
+                                                    {errors.sku && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                            {errors.sku}
+                                                        </p>
+                                                    )}
+                                                    <Input
+                                                        id="stock"
+                                                        name="stock"
+                                                        type="number"
+                                                        value={data.stock}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "stock",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Stock"
+                                                        className="p-2"
+                                                        required
+                                                    />
+                                                    {errors.stock && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                            {errors.stock}
+                                                        </p>
+                                                    )}
+                                                    <Input
+                                                        id="min_stock"
+                                                        name="min_stock"
+                                                        type="number"
+                                                        value={data.min_stock}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "min_stock",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Stock minimum"
+                                                        className="p-2"
+                                                        required
+                                                    />
+                                                    {errors.min_stock && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                            {errors.min_stock}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <Select
+                                                    value={data.category_id}
+                                                    onValueChange={(value) =>
+                                                        setData(
+                                                            "category_id",
+                                                            value
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select a fruit" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup>
+                                                            <SelectLabel>
+                                                                Categories
+                                                            </SelectLabel>
+                                                            <ScrollArea
+                                                                ref={scrollRef}
+                                                                className="h-60 w-full"
+                                                                onScroll={
+                                                                    handleScroll
+                                                                }
+                                                            >
+                                                                {categories
+                                                                    .slice(
+                                                                        0,
+                                                                        visibleCount
+                                                                    )
+                                                                    .map(
+                                                                        (
+                                                                            category
+                                                                        ) => (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    category.id
+                                                                                }
+                                                                                value={
+                                                                                    category.id
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    category.name
+                                                                                }
+                                                                            </SelectItem>
+                                                                        )
+                                                                    )}
+                                                            </ScrollArea>
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                                {errors.category_id && (
+                                                    <p className="text-sm text-red-500 mt-1">
+                                                        {errors.category_id}
+                                                    </p>
+                                                )}
+
+                                                {/* <Input
+                                                    id="category_id"
+                                                    name="category_id"
+                                                    type="text"
+                                                    value={data.category_id}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "category_id",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder="Category"
+                                                    className="p-2"
+                                                    required
+                                                />
+                                                {errors.category_id && (
+                                                    <p className="text-sm text-red-500 mt-1">
+                                                        {errors.category_id}
+                                                    </p>
+                                                )} */}
+                                                <Input
+                                                    id="date"
+                                                    name="date"
+                                                    type="date"
+                                                    value={data.date}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "name",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder="Tanggal"
+                                                    className="p-2"
+                                                    required
+                                                />
+                                                {errors.date && (
+                                                    <p className="text-sm text-red-500 mt-1">
+                                                        {errors.date}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </>
                                     )}
                                 />
@@ -327,9 +533,9 @@ export default function Categories() {
                                 />
                             </div> */}
                             <CardContent className="pt-6">
-                                <DataTable
+                                {/* <DataTable
                                     columns={columns}
-                                    data={categories}
+                                    data={product}
                                     searchKey="name"
                                     searchPlaceholder="Search metrics..."
                                     exportData={true}
@@ -388,7 +594,7 @@ export default function Categories() {
                                     onDeleteView={(viewId) =>
                                         console.log("Delete view", viewId)
                                     }
-                                />
+                                /> */}
                             </CardContent>
                         </div>
                     </div>

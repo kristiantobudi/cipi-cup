@@ -70,7 +70,7 @@ const data = {
                 },
                 {
                     title: "Product",
-                    url: "#",
+                    url: route("product.index"),
                 },
                 {
                     title: "Stock",
