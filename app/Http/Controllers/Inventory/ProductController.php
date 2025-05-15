@@ -24,30 +24,52 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-         $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255',
-        "sku" => "required|string|max:255",
-        "stock" => "required|integer",
-        "min_stock" => "integer",
-        "category_id" => "required",
-    ]);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            "sku" => "required|string|max:255",
+            "stock" => "required|integer",
+            "min_stock" => "integer",
+            "category_id" => "required",
+        ]);
 
-    if ($validator->fails()) {
-        return $this->sendError("Validation failed", $validator->errors());
+        if ($validator->fails()) {
+            return $this->sendError("Validation failed", $validator->errors());
+        }
+
+        $validated = $validator->validated();
+
+        $product = Product::create([
+            'name' => $validated['name'],
+            'sku' => $validated['sku'],
+            'stock' => $validated['stock'],
+            'min_stock' => $validated['min_stock'] ?? null,
+            'category_id' => $validated['category_id'],
+            'users_id' => Auth::id(),
+            // "date" => now(),
+        ]);
+
+        return redirect()->route('product.index')->with('success', 'Product created successfully.');
     }
 
-    $validated = $validator->validated();
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:255',
+            'stock' => 'required|integer',
+            'min_stock' => 'nullable|integer',
+            'category_id' => 'required|exists:categories,id',
+        ]);
 
-    $product = Product::create([
-        'name' => $validated['name'],
-        'sku' => $validated['sku'],
-        'stock' => $validated['stock'],
-        'min_stock' => $validated['min_stock'] ?? null,
-        'category_id' => $validated['category_id'],
-        'users_id' => Auth::id(),
-        // "date" => now(),
-    ]);
+        $product->update($validated);
 
-    return redirect()->route('product.index')->with('success', 'Product created successfully.');
+        return redirect()->route('product.index')->with('success', 'Product updated successfully.');
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+
+        return redirect()->route('product.index')->with('success', 'Product deleted successfully.');
     }
 }

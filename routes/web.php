@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/inventory/categories', [CategoriesController::class, 'store'])->name('Categories.store');
     Route::get('/inventory/product', [ProductController::class, 'index'])->name('product.index');
     Route::post('/inventory/product', [ProductController::class, 'store'])->name('product.store');
+    Route::put('/inventory/product/{product}', [ProductController::class, 'update'])->name('product.update');
+    Route::delete('/inventory/product', [ProductController::class, 'destroy'])->name('product.destroy');
     Route::get('/inventory/stock', [StockController::class, 'index'])->name('stock.index');
     Route::post('/inventory/stock', [StockController::class, 'store'])->name('stock.store');
 });

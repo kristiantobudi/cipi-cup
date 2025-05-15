@@ -10,6 +10,7 @@ import {
 } from "@/Components/Advanced-Table";
 import { DatePicker } from "@/Components/DatePicker";
 import Dropdown from "@/Components/Dropdown";
+import { AlertModalDeleted } from "@/Components/Modal/ModalDeleted";
 import { CustomsModal } from "@/Components/Modal/ModalWithForm";
 import TableData from "@/Components/TableData";
 import { CardContent } from "@/Components/ui/card";
@@ -64,7 +65,7 @@ type Category = {
 };
 
 export default function Products() {
-    const product: { name: string; createdAt: string }[] =
+    const product: { id: string; name: string; createdAt: string }[] =
         usePage().props.products;
     const categories = (usePage().props.categories ?? []) as {
         id: string;
@@ -76,6 +77,8 @@ export default function Products() {
     );
     const [visibleCount, setVisibleCount] = useState(10);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const handleScroll = () => {
         const el = scrollRef.current;
@@ -284,7 +287,10 @@ export default function Products() {
             },
             {
                 label: "Delete",
-                onClick: (data) => console.log("Delete", data),
+                onClick: (data) => {
+                    setSelectedItem(data);
+                    setIsDeleteOpen(true);
+                },
                 icon: <Trash className="h-4 w-4" />,
             },
         ]),
@@ -345,6 +351,15 @@ export default function Products() {
                                 Categories
                             </div>
                             <div className="p-6">
+                                <AlertModalDeleted
+                                    routeName="product.destroy"
+                                    defaultData={{ id: selectedItem?.id }}
+                                    open={isDeleteOpen}
+                                    onClose={() => setIsDeleteOpen(false)}
+                                    title="Hapus Data?"
+                                    description={`Yakin ingin menghapus "${selectedItem?.name}"?`}
+                                />
+
                                 <CustomsModal
                                     title="Create New Product"
                                     triggerLabel="Add Product"
