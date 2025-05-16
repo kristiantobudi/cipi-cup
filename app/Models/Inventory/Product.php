@@ -5,10 +5,12 @@ namespace App\Models\Inventory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Inventory\Categories;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     public $incrementing = false;
 
     protected static function boot()

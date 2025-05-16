@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Models\Inventory;
+namespace App\Models\Sales;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use App\Models\User;
 use App\Models\Inventory\Product;
 
-class Stock extends Model
+class SalesItems extends Model
 {
     use HasFactory, SoftDeletes;
-
     public $incrementing = false;
 
     protected static function boot()
@@ -25,21 +23,15 @@ class Stock extends Model
     }
 
     protected $fillable = [
-        "product_id",
-        "type",
+        "sales_id",
+        "products_id",
         "quantity",
         "price",
-        "description",
-        "date",
-        "users_id",
+        "subtotal"
     ];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
-    }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

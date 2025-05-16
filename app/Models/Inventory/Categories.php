@@ -3,11 +3,13 @@
 namespace App\Models\Inventory;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+
 class Categories extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public $incrementing = false;
 

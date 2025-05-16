@@ -22,7 +22,7 @@ interface CustomModalProps {
     renderFields: (
         data: any,
         setData: (field: string, value: any) => void,
-        errors: Record<string, string>
+        errors: Record<string, string>,
     ) => JSX.Element;
 }
 
@@ -56,27 +56,29 @@ export function CustomsModal({
                     {triggerLabel}
                 </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
-                <form onSubmit={submit}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>{title}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            <div className="pb-4">
-                                {renderFields(data, setData, errors)}
-                            </div>
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setOpen(false)}>
-                            Cancel
-                        </AlertDialogCancel>
-                        <Button type="submit" disabled={processing}>
-                            Create
-                        </Button>
-                        {/* <AlertDialogAction type="submit" disabled={processing}>
+            <AlertDialogContent className="w-screen max-w-5xl md">
+                <div className="items-center">
+                    <form onSubmit={submit}>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>{title}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                <div className="pb-4">
+                                    {renderFields(data, setData, errors)}
+                                </div>
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setOpen(false)}>
+                                Cancel
+                            </AlertDialogCancel>
+                            <Button type="submit" disabled={processing}>
+                                Create
+                            </Button>
+                            {/* <AlertDialogAction type="submit" disabled={processing}>
                         </AlertDialogAction> */}
-                    </AlertDialogFooter>
-                </form>
+                        </AlertDialogFooter>
+                    </form>
+                </div>
             </AlertDialogContent>
         </AlertDialog>
     );

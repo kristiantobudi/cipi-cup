@@ -36,9 +36,9 @@ const data = {
     },
     teams: [
         {
-            name: "Acme Inc",
+            name: "Cipi Cup",
             logo: GalleryVerticalEnd,
-            plan: "Enterprise",
+            plan: "Dashboard Penjualan",
         },
         {
             name: "Acme Corp.",

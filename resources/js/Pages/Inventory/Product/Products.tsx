@@ -65,20 +65,19 @@ type Category = {
 };
 
 export default function Products() {
-    const product: { id: string; name: string; createdAt: string }[] =
-        usePage().props.products;
+    const product: MetricData[] = usePage().props.products;
     const categories = (usePage().props.categories ?? []) as {
         id: string;
         name: string;
         created_at: string;
     }[];
     const categoryMap = Object.fromEntries(
-        categories.map((p) => [p.id, p.name])
+        categories.map((p) => [p.id, p.name]),
     );
     const [visibleCount, setVisibleCount] = useState(10);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState<MetricData | null>(null);
 
     const handleScroll = () => {
         const el = scrollRef.current;
@@ -147,7 +146,7 @@ export default function Products() {
                         day: "2-digit",
                         month: "long",
                         year: "numeric",
-                    }
+                    },
                 );
 
                 return <div className="font-medium">{formattedDate}</div>;
@@ -348,7 +347,7 @@ export default function Products() {
                     <div className="overflow-hidden bg-primary-foreground shadow-sm sm:rounded-lg">
                         <div className="flex items-center justify-between">
                             <div className="p-6 text-gray-900 font-bold text-2xl">
-                                Categories
+                                Products
                             </div>
                             <div className="p-6">
                                 <AlertModalDeleted
@@ -384,7 +383,7 @@ export default function Products() {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "name",
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         placeholder="Product Name"
@@ -404,7 +403,7 @@ export default function Products() {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "sku",
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         placeholder="SKU"
@@ -424,7 +423,7 @@ export default function Products() {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "stock",
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         placeholder="Stock"
@@ -444,7 +443,7 @@ export default function Products() {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "min_stock",
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         placeholder="Stock minimum"
@@ -462,7 +461,7 @@ export default function Products() {
                                                     onValueChange={(value) =>
                                                         setData(
                                                             "category_id",
-                                                            value
+                                                            value,
                                                         )
                                                     }
                                                 >
@@ -484,11 +483,11 @@ export default function Products() {
                                                                 {categories
                                                                     .slice(
                                                                         0,
-                                                                        visibleCount
+                                                                        visibleCount,
                                                                     )
                                                                     .map(
                                                                         (
-                                                                            category
+                                                                            category,
                                                                         ) => (
                                                                             <SelectItem
                                                                                 key={
@@ -502,7 +501,7 @@ export default function Products() {
                                                                                     category.name
                                                                                 }
                                                                             </SelectItem>
-                                                                        )
+                                                                        ),
                                                                     )}
                                                             </ScrollArea>
                                                         </SelectGroup>

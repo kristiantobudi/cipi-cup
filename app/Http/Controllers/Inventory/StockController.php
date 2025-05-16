@@ -29,7 +29,7 @@ class StockController extends Controller
             'type' => ['required', Rule::in(['in', 'out'])],
             'quantity' => 'required|integer',
             'price' => 'required|integer',
-            'description' => 'string',
+            // 'description' => 'string',
             'product_id' => 'required',
         ]);
 
