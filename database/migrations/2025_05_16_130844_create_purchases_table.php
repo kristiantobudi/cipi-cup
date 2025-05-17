@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchases', function (Blueprint $table) {
-            $table->uuid()->primary();
+            $table->uuid('id')->primary();
+            $table->foreignId('users_id')->constrained()->onDelete('cascade');
             $table->string('source')->nullable();
             $table->text('description')->nullable();
-            $table->decimal('total_amount', 10, 2);
-            $table->foreignId('users_id')->constrained()->onDelete('cascade');
-            $table->date('date');
+            $table->decimal('total_amount', 15, 2)->default(0);
+            $table->dateTime('date');
             $table->timestamps();
             $table->softDeletes();
         });

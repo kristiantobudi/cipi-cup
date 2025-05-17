@@ -24,6 +24,24 @@ export default function DefaultLayout({
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    const segments = location.pathname.split("/").filter(Boolean);
+
+    const breadcrumbs = segments.map((segment, index) => {
+        const url = "/" + segments.slice(0, index + 1).join("/");
+        const isUuid =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                segment,
+            );
+
+        return {
+            label: isUuid
+                ? "Detail"
+                : segment.charAt(0).toUpperCase() + segment.slice(1),
+            url: index < segments.length - 1 ? url : null,
+        };
+    });
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -37,17 +55,32 @@ export default function DefaultLayout({
                         />
                         <Breadcrumb>
                             <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Building Your Application
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block" />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>
-                                        Data Fetching
-                                    </BreadcrumbPage>
-                                </BreadcrumbItem>
+                                {breadcrumbs.map(
+                                    (crumb: any, index: number) => (
+                                        <>
+                                            <BreadcrumbItem key={index}>
+                                                {crumb.url ? (
+                                                    <BreadcrumbLink
+                                                        className="text-sm text-muted-foreground hover:text-primary"
+                                                        href={crumb.url}
+                                                    >
+                                                        {crumb.label}
+                                                    </BreadcrumbLink>
+                                                ) : (
+                                                    <BreadcrumbPage className="font-bold text-primary">
+                                                        {crumb.label}
+                                                    </BreadcrumbPage>
+                                                )}
+                                            </BreadcrumbItem>
+
+                                            {index < breadcrumbs.length - 1 && (
+                                                <BreadcrumbSeparator
+                                                    key={`sep-${index}`}
+                                                />
+                                            )}
+                                        </>
+                                    ),
+                                )}
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>

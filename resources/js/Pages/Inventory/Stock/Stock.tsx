@@ -29,7 +29,7 @@ import {
 } from "@/Components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import DefaultLayout from "@/Layouts/DefaultLayout";
-import { usePage } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import {
     Activity,
     ArrowDownRight,
@@ -108,7 +108,7 @@ export default function StockPage() {
             accessorKey: "product_id",
             header: createSortableHeader<MetricData>(
                 "Product Name",
-                "product_id"
+                "product_id",
             ),
             cell: ({ row }) => {
                 const productId = row.getValue("product_id") as string;
@@ -143,7 +143,7 @@ export default function StockPage() {
                         day: "2-digit",
                         month: "long",
                         year: "numeric",
-                    }
+                    },
                 );
 
                 return <div className="font-medium">{formattedDate}</div>;
@@ -216,9 +216,10 @@ export default function StockPage() {
 
     return (
         <DefaultLayout>
+            <Head title={`Stock`} />
             <div className="py-4">
                 <div className="mx-auto max-w-full sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-primary-foreground shadow-sm sm:rounded-lg">
+                    <div className="overflow-hidden bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
                         <div className="flex items-center justify-between">
                             <div className="p-6 text-gray-900 font-bold text-2xl">
                                 Stock
@@ -278,7 +279,7 @@ export default function StockPage() {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "quantity",
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         placeholder="Quantity"
@@ -298,7 +299,7 @@ export default function StockPage() {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "price",
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         placeholder="Price"
@@ -316,7 +317,7 @@ export default function StockPage() {
                                                     onValueChange={(value) =>
                                                         setData(
                                                             "product_id",
-                                                            value
+                                                            value,
                                                         )
                                                     }
                                                 >
@@ -338,11 +339,11 @@ export default function StockPage() {
                                                                 {products
                                                                     .slice(
                                                                         0,
-                                                                        visibleCount
+                                                                        visibleCount,
                                                                     )
                                                                     .map(
                                                                         (
-                                                                            product
+                                                                            product,
                                                                         ) => (
                                                                             <SelectItem
                                                                                 key={
@@ -356,7 +357,7 @@ export default function StockPage() {
                                                                                     product.name
                                                                                 }
                                                                             </SelectItem>
-                                                                        )
+                                                                        ),
                                                                     )}
                                                             </ScrollArea>
                                                         </SelectGroup>
@@ -384,7 +385,7 @@ export default function StockPage() {
                         </div>
                     </div>
                     <div className="pt-6">
-                        <div className="overflow-hidden bg-primary-foreground shadow-sm sm:rounded-lg">
+                        <div className="overflow-hidden bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
                             {/* <div className="p-6">
                                 <TableData
                                     columns={columns}

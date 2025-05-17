@@ -27,7 +27,7 @@ import {
 } from "@/Components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import DefaultLayout from "@/Layouts/DefaultLayout";
-import { usePage } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import {
     Activity,
     ArrowDownRight,
@@ -342,9 +342,10 @@ export default function Products() {
 
     return (
         <DefaultLayout>
+            <Head title={`Products`} />
             <div className="py-4">
                 <div className="mx-auto max-w-full sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-primary-foreground shadow-sm sm:rounded-lg">
+                    <div className="overflow-hidden bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
                         <div className="flex items-center justify-between">
                             <div className="p-6 text-gray-900 font-bold text-2xl">
                                 Products
@@ -541,7 +542,7 @@ export default function Products() {
                         </div>
                     </div>
                     <div className="pt-6">
-                        <div className="overflow-hidden bg-primary-foreground shadow-sm sm:rounded-lg">
+                        <div className="overflow-hidden bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
                             {/* <div className="p-6">
                                 <TableData
                                     columns={columns}

@@ -4,15 +4,35 @@ import {
     createNumberColumn,
     createSelectionColumn,
     createSelectionColumnName,
+    createSizeColumnWithBadge,
     createSortableHeader,
     createStatusColumn,
     DataTable,
 } from "@/Components/Advanced-Table";
+import { CustomChart } from "@/Components/Chart/Chart";
+import { DatePicker } from "@/Components/DatePicker";
+import Dropdown from "@/Components/Dropdown";
 import { CustomsModal } from "@/Components/Modal/ModalWithForm";
+import { SelectComponent } from "@/Components/Select/Select";
+import TableData from "@/Components/TableData";
+import { TextareaWithLabel } from "@/Components/TextArea/TextAreaWithLabel";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { CardContent } from "@/Components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    SelectTrigger,
+    SelectValue,
+    Select,
+    SelectContent,
+    SelectLabel,
+    SelectItem,
+    SelectGroup,
+} from "@/Components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import DefaultLayout from "@/Layouts/DefaultLayout";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import {
     Activity,
     ArrowDownRight,
@@ -22,54 +42,116 @@ import {
     CirclePlus,
     Edit,
     Eye,
-    Link,
     Plug2Icon,
+    Plus,
     Trash,
     TrendingUp,
     Users,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type MetricData = {
     id: string;
     name: string;
     category: string;
-    value: number;
+    product_id: string;
+    type: string;
+    price: number;
     previousValue: number;
     change: number;
     status: string;
     lastUpdated: string | Date;
     trend: number[];
+    quantity: number;
 };
 
-export default function Categories() {
-    const categories: { name: string; createdAt: string }[] =
-        usePage().props.categories;
+interface PurchaseData {
+    date: string;
+    total_amount: number;
+}
 
-    // const columns = [
-    //     // {
-    //     //     key: "index",
-    //     //     label: "No",
-    //     //     render: (_value: any, _row: any, index: any) => index + 1,
-    //     // },
-    //     {
-    //         key: "name",
-    //         label: "Category Name",
-    //     },
-    //     {
-    //         key: "created_at",
-    //         label: "Created At",
-    //         render: (val: any) => new Date(val).toLocaleDateString(),
-    //     },
-    // ];
+interface PurchaseSummary {
+    daily: number;
+    weekly: number;
+    monthly: number;
+}
+
+interface Props extends PageProps {
+    purchaseData: PurchaseData[];
+    purchaseSummary: PurchaseSummary;
+}
+
+export default function PurchasesPage() {
+    // Show Product
+    const purchases = (usePage().props.purchases ?? []) as {
+        id: string;
+        source: string;
+        total_amount: number;
+        created_at: string;
+    }[];
+    const purchaseSummary = (usePage().props.purchaseSummary ?? {}) as {
+        daily: number;
+        weekly: number;
+        monthly: number;
+    };
+
+    // Show Stock
+
+    const [visibleCount, setVisibleCount] = useState(10);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [type, setType] = useState("");
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<MetricData | null>(null);
+
+    // Enum Type
+    const typeEnum = ["in", "out"] as const;
+    const typeOptions = typeEnum.map((type) => ({
+        label: type.charAt(0).toUpperCase() + type.slice(1),
+        value: type,
+    }));
+    // to Scroll from scroll area
+    const handleScroll = () => {
+        const el = scrollRef.current;
+        if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+            // Near bottom, load 10 more items
+            setVisibleCount((prev) => Math.min(prev + 10, purchases.length));
+        }
+    };
+
+    // Reset visibleCount if categories change
+    useEffect(() => {
+        setVisibleCount(10);
+    }, [purchases]);
 
     const columns = [
         createSelectionColumn<MetricData>(),
         {
-            accessorKey: "name",
-            header: createSortableHeader<MetricData>("Category Name", "name"),
+            accessorKey: "source",
+            header: createSortableHeader<MetricData>("Product Name", "source"),
             cell: ({ row }) => {
                 return (
-                    <div className="font-medium">{row.getValue("name")}</div>
+                    <div className="font-medium">{row.getValue("source")}</div>
+                );
+            },
+        },
+        {
+            accessorKey: "total_amount",
+            header: createSortableHeader<MetricData>(
+                "Product Name",
+                "total_amount",
+            ),
+            cell: ({ row }) => {
+                const value = row.getValue("total_amount") as number;
+
+                const formatted = new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                }).format(value);
+                return (
+                    <Badge className="font-medium" variant="destructive">
+                        {formatted}
+                    </Badge>
                 );
             },
         },
@@ -90,132 +172,11 @@ export default function Categories() {
                 return <div className="font-medium">{formattedDate}</div>;
             },
         },
-
-        // createSelectionColumnName<MetricData>("Metric Name", "name"),
-        // {
-        //     accessorKey: "category",
-        //     header: "Category",
-        //     cell: ({ row }) => {
-        //         const category = row.getValue("category") as string;
-        //         return (
-        //             <div className="flex items-center">
-        //                 {category === "Sales" && (
-        //                     <BarChart className="mr-2 h-4 w-4 text-primary opacity-70" />
-        //                 )}
-        //                 {category === "Marketing" && (
-        //                     <TrendingUp className="mr-2 h-4 w-4 text-secondary opacity-70" />
-        //                 )}
-        //                 {category === "Web Analytics" && (
-        //                     <Activity className="mr-2 h-4 w-4 text-primary opacity-70" />
-        //                 )}
-        //                 {category === "Customer" && (
-        //                     <Users className="mr-2 h-4 w-4 text-secondary opacity-70" />
-        //                 )}
-        //                 {category}
-        //             </div>
-        //         );
-        //     },
-        // },
-        // createNumberColumn<MetricData>("Current Value", "value", {
-        //     decimals: 2,
-        //     suffix: (row) => {
-        //         const name = row.name.toLowerCase();
-        //         if (name.includes("rate") || name.includes("satisfaction"))
-        //             return "%";
-        //         if (name.includes("time")) return "s";
-        //         if (
-        //             name.includes("cost") ||
-        //             name.includes("value") ||
-        //             name.includes("revenue")
-        //         )
-        //             return "$";
-        //         return "";
-        //     },
-        // }),
-
-        // {
-        //     accessorKey: "change",
-        //     header: "Change",
-        //     cell: ({ row }) => {
-        //         const change = row.getValue("change") as number;
-        //         const isPositive = change > 0;
-        //         const isNegative = change < 0;
-        //         const isImprovement =
-        //             row.original.name.toLowerCase().includes("cost") ||
-        //             row.original.name.toLowerCase().includes("bounce") ||
-        //             row.original.name.toLowerCase().includes("abandonment") ||
-        //             row.original.name.toLowerCase().includes("time")
-        //                 ? !isPositive
-        //                 : isPositive;
-
-        //         return (
-        //             <div
-        //                 className={`flex items-center ${
-        //                     isImprovement
-        //                         ? "text-green-600 dark:text-green-500"
-        //                         : "text-red-600 dark:text-red-500"
-        //                 }`}
-        //             >
-        //                 {isPositive ? (
-        //                     <ArrowUpRight className="mr-1 h-4 w-4" />
-        //                 ) : isNegative ? (
-        //                     <ArrowDownRight className="mr-1 h-4 w-4" />
-        //                 ) : null}
-        //                 <span>{Math.abs(change).toFixed(1)}%</span>
-        //             </div>
-        //         );
-        //     },
-        // },
-        // {
-        //     accessorKey: "trend",
-        //     header: "Trend",
-        //     cell: ({ row }) => {
-        //         const trend = row.getValue("trend") as number[];
-        //         const min = Math.min(...trend);
-        //         const max = Math.max(...trend);
-        //         const range = max - min;
-
-        //         return (
-        //             <div className="w-24 h-8 flex items-end">
-        //                 {trend.map((value, index) => {
-        //                     const height =
-        //                         range === 0
-        //                             ? 50
-        //                             : ((value - min) / range) * 100;
-        //                     const isLast = index === trend.length - 1;
-
-        //                     return (
-        //                         <div
-        //                             key={index}
-        //                             className={`w-3 mx-0.5 rounded-t-sm ${
-        //                                 isLast ? "bg-primary" : "bg-primary/30"
-        //                             }`}
-        //                             style={{
-        //                                 height: `${Math.max(10, height)}%`,
-        //                             }}
-        //                         />
-        //                     );
-        //                 })}
-        //             </div>
-        //         );
-        //     },
-        // },
-        // createStatusColumn<MetricData>("Status", "status", {
-        //     improved: { label: "Improved", variant: "default" },
-        //     declined: { label: "Declined", variant: "destructive" },
-        //     unchanged: { label: "Unchanged", variant: "secondary" },
-        // }),
-        // createDateColumn<MetricData>("Last Updated", "lastUpdated", {
-        //     month: "short",
-        //     day: "numeric",
-        //     hour: "2-digit",
-        //     minute: "2-digit",
-        // }),
         createActionsColumn<MetricData>([
             {
-                label: "View Details",
-                onClick: (data) => console.log("View", data),
+                label: "View",
                 icon: <Eye className="h-4 w-4" />,
+                href: (data) => route("purchases.show", data.id),
             },
             {
                 label: "Edit",
@@ -277,47 +238,40 @@ export default function Categories() {
 
     return (
         <DefaultLayout>
-            <Head title={`Categories`} />
+            <Head title={`Pembelian`} />
             <div className="py-4">
-                <div className="mx-auto max-w-full sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
+                <div className="mx-auto max-w-full sm:px-6 lg:px-8 ">
+                    <div className="bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
                         <div className="flex items-center justify-between">
                             <div className="p-6 text-gray-900 font-bold text-2xl">
-                                Categories
+                                Purchases
                             </div>
                             <div className="p-6">
-                                <CustomsModal
-                                    title="Create New Category"
-                                    triggerLabel="Add Category"
-                                    routeName="Categories.store"
-                                    defaultData={{ name: "" }}
-                                    renderFields={(data, setData, errors) => (
-                                        <>
-                                            <Input
-                                                id="name"
-                                                name="name"
-                                                type="text"
-                                                value={data.name}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "name",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                placeholder="Category Name"
-                                                className="p-2"
-                                                required
-                                            />
-                                            {errors.name && (
-                                                <p className="text-sm text-red-500 mt-1">
-                                                    {errors.name}
-                                                </p>
-                                            )}
-                                        </>
-                                    )}
-                                />
+                                <Button variant="default">
+                                    <Link
+                                        href={route("purchases.create")}
+                                        className="flex flex-row gap-2"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                        Add New
+                                    </Link>
+                                </Button>
                             </div>
                         </div>
+                    </div>
+                    <div className="pt-6">
+                        <CustomChart
+                            data={purchases}
+                            config={{
+                                total_amount: {
+                                    label: "Total Purchases",
+                                    color: "hsl(var(--chart-1))",
+                                },
+                            }}
+                            xKey="date"
+                            yKeys={["total_amount"]}
+                            summary={purchaseSummary}
+                        />
                     </div>
                     <div className="pt-6">
                         <div className="overflow-hidden bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
@@ -330,7 +284,7 @@ export default function Categories() {
                             <CardContent className="pt-6">
                                 <DataTable
                                     columns={columns}
-                                    data={categories}
+                                    data={purchases as any[]}
                                     searchKey="name"
                                     searchPlaceholder="Search metrics..."
                                     exportData={true}

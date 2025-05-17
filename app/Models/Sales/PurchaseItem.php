@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use App\Models\Sales\Purchases;
 
 class PurchaseItem extends Model
 {
@@ -21,9 +22,14 @@ class PurchaseItem extends Model
         });
     }
 
+    public function purchase()
+    {
+        return $this->belongsTo(Purchases::class, 'purchase_id');
+    }
+
     protected $fillable = [
-        "purchases_id",
-        "product_id",
+        "purchase_id",
+        "item_name",
         "quantity",
         "unit",
         "price",

@@ -11,6 +11,7 @@ import {
     Map,
     PieChart,
     Settings2,
+    ShoppingBag,
     SquareTerminal,
 } from "lucide-react";
 
@@ -79,13 +80,13 @@ const data = {
             ],
         },
         {
-            title: "Models",
+            title: "Sales",
             url: "#",
-            icon: Bot,
+            icon: ShoppingBag,
             items: [
                 {
-                    title: "Genesis",
-                    url: "#",
+                    title: "Purchases",
+                    url: route("purchases.index"),
                 },
                 {
                     title: "Explorer",

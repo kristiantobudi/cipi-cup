@@ -29,11 +29,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { Link } from "@inertiajs/react";
 
 // Helper function to create sortable header
 export function createSortableHeader<T>(
     label: string,
-    accessor: keyof T
+    accessor: keyof T,
 ): ColumnDef<T>["header"] {
     return ({ column }) => {
         console.log("Rendering header for:", accessor);
@@ -92,9 +93,10 @@ export function createSelectionColumn<T>(): ColumnDef<T> {
 export function createActionsColumn<T>(
     actions: Array<{
         label: string;
-        onClick: (data: T) => void;
+        onClick?: (data: T) => void;
         icon?: React.ReactNode;
-    }>
+        href?: string | ((data: T) => string);
+    }>,
 ): ColumnDef<T> {
     return {
         id: "actions",
@@ -113,17 +115,44 @@ export function createActionsColumn<T>(
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        {actions.map((action, index) => (
-                            <DropdownMenuItem
-                                key={index}
-                                onClick={() => action.onClick(data)}
-                            >
-                                {action.icon && (
-                                    <span className="mr-2">{action.icon}</span>
-                                )}
-                                {action.label}
-                            </DropdownMenuItem>
-                        ))}
+                        {actions.map((action, index) => {
+                            const href =
+                                typeof action.href === "function"
+                                    ? action.href(data)
+                                    : action.href;
+
+                            return (
+                                <DropdownMenuItem key={index} asChild>
+                                    {href ? (
+                                        <Link
+                                            href={href}
+                                            className="flex items-center w-full"
+                                        >
+                                            {action.icon && (
+                                                <span className="mr-2">
+                                                    {action.icon}
+                                                </span>
+                                            )}
+                                            {action.label}
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            onClick={() =>
+                                                action.onClick?.(data)
+                                            }
+                                            className="flex items-center w-full"
+                                        >
+                                            {action.icon && (
+                                                <span className="mr-2">
+                                                    {action.icon}
+                                                </span>
+                                            )}
+                                            {action.label}
+                                        </button>
+                                    )}
+                                </DropdownMenuItem>
+                            );
+                        })}
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
@@ -133,7 +162,7 @@ export function createActionsColumn<T>(
 
 export function createSelectionColumnName<T>(
     header: string,
-    accessor: keyof T
+    accessor: keyof T,
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -151,7 +180,7 @@ export function createSelectionColumnName<T>(
 
 export function createSelectionColumnNumber<T>(
     header: string,
-    accessor: keyof T
+    accessor: keyof T,
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -166,7 +195,7 @@ export function createSelectionColumnNumber<T>(
 
 export function createSizeColumnWithBadge<T>(
     header: string,
-    accessor: keyof T
+    accessor: keyof T,
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -192,7 +221,7 @@ export function createSizeColumnWithBadge<T>(
 
 export function createLocationColumnBadge<T>(
     header: string,
-    accessor: keyof T
+    accessor: keyof T,
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -222,7 +251,7 @@ export function createLocationColumnBadge<T>(
 
 export function createCopyableColumn<T>(
     header: string,
-    accessor: keyof T
+    accessor: keyof T,
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -276,7 +305,7 @@ export function createStatusColumn<T>(
             label: string;
             variant: "default" | "secondary" | "destructive" | "outline";
         }
-    >
+    >,
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -305,7 +334,7 @@ export function createDateColumn<T>(
         year: "numeric",
         month: "short",
         day: "numeric",
-    }
+    },
 ): ColumnDef<T> {
     return {
         accessorKey: accessor as string,
@@ -336,7 +365,7 @@ export function createNumberColumn<T>(
         suffix?: string | ((row: T) => string);
         decimals?: number;
         sortable?: boolean;
-    } = {}
+    } = {},
 ): ColumnDef<T> {
     const { prefix = "", suffix, decimals = 0, sortable = false } = options;
 
@@ -346,7 +375,7 @@ export function createNumberColumn<T>(
             ? ({ column }) =>
                   createSortableHeader<T>(
                       header,
-                      accessor as string
+                      accessor as string,
                   )({ column })
             : header,
         cell: ({ row }) => {
@@ -361,7 +390,7 @@ export function createNumberColumn<T>(
             const resolvedSuffix =
                 typeof suffix === "function"
                     ? suffix(row.original)
-                    : suffix ?? "";
+                    : (suffix ?? "");
 
             return (
                 <div className="font-mono">
