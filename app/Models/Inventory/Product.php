@@ -25,6 +25,7 @@ class Product extends Model
     protected $fillable = [
         "name",
         "sku",
+        "price",
         "category_id",
         "stock",
         "min_stock",

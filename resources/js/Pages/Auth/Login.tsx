@@ -47,7 +47,7 @@ export default function Login({
                         <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
                             <GalleryVerticalEnd className="size-4" />
                         </div>
-                        Acme Inc.
+                        Cipi Cup
                     </a>
                 </div>
                 <div className="flex flex-1 items-center justify-center">
@@ -101,6 +101,7 @@ export default function Login({
                                         onChange={(e) =>
                                             setData("password", e.target.value)
                                         }
+                                        placeholder="••••••••"
                                         required
                                     />
                                 </div>
@@ -127,12 +128,12 @@ export default function Login({
                             </div>
                             <div className="text-center text-sm">
                                 Don&apos;t have an account?{" "}
-                                <a
-                                    href="#"
+                                <Link
+                                    href={route("register")}
                                     className="underline underline-offset-4"
                                 >
                                     Sign up
-                                </a>
+                                </Link>
                             </div>
                         </form>
                     </div>

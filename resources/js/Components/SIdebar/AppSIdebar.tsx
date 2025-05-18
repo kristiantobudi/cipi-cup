@@ -57,7 +57,13 @@ const data = {
             title: "Dashboard",
             url: "#",
             icon: PieChart,
-            isActive: false,
+            isActive: true,
+            items: [
+                {
+                    title: "Dashboard",
+                    url: route("dashboard"),
+                },
+            ],
         },
         {
             title: "Inventory",
@@ -83,18 +89,15 @@ const data = {
             title: "Sales",
             url: "#",
             icon: ShoppingBag,
+            isActive: true,
             items: [
                 {
                     title: "Purchases",
                     url: route("purchases.index"),
                 },
                 {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
+                    title: "Sales",
+                    url: route("sales.index"),
                 },
             ],
         },

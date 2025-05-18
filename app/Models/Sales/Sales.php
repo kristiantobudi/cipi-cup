@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Sales\SalesItems;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,8 +22,14 @@ class Sales extends Model
         });
     }
 
+    public function items()
+    {
+        return $this->hasMany(SalesItems::class, "sales_id");
+    }
+
     protected $fillable = [
         "date",
         "total_amount",
+        "users_id"
     ];
 }

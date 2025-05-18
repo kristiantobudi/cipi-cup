@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('sales_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreign('sales_id')->references('id')->on('sales');
-            $table->foreign('products_id')->references('id')->on('products');
+            $table->uuid('sales_id');
+            $table->foreign('sales_id')->references('id')->on('sales')->onDelete('  cascade');
+            $table->uuid('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreignId('users_id')->constrained()->onDelete('cascade');
+            $table->string('product_name');
+            $table->decimal('product_price', 10, 2);
             $table->integer('quantity');
-            $table->decimal('price', 10, 2);
             $table->decimal('subtotal', 10, 2);
             $table->timestamps();
             $table->softDeletes();

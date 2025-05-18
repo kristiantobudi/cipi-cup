@@ -13,6 +13,7 @@ import Dropdown from "@/Components/Dropdown";
 import { AlertModalDeleted } from "@/Components/Modal/ModalDeleted";
 import { CustomsModal } from "@/Components/Modal/ModalWithForm";
 import TableData from "@/Components/TableData";
+import { Badge } from "@/components/ui/badge";
 import { CardContent } from "@/Components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -124,6 +125,23 @@ export default function Products() {
             header: createSortableHeader<MetricData>("SKU", "sku"),
             cell: ({ row }) => {
                 return <div className="font-medium">{row.getValue("sku")}</div>;
+            },
+        },
+        {
+            accessorKey: "price",
+            header: createSortableHeader<MetricData>("Price", "price"),
+            cell: ({ row }) => {
+                const value = row.getValue("price") as number;
+
+                const formatted = new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                }).format(value);
+                return (
+                    <Badge className="font-medium" variant="destructive">
+                        {formatted}
+                    </Badge>
+                );
             },
         },
         {
@@ -368,6 +386,7 @@ export default function Products() {
                                         name: "",
                                         sku: "",
                                         stock: "",
+                                        price: "",
                                         min_stock: "",
                                         category_id: "",
                                         users_id: "",
@@ -394,6 +413,26 @@ export default function Products() {
                                                     {errors.name && (
                                                         <p className="text-sm text-red-500 mt-1">
                                                             {errors.name}
+                                                        </p>
+                                                    )}
+                                                    <Input
+                                                        id="price"
+                                                        name="price"
+                                                        type="number"
+                                                        value={data.price}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "price",
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        placeholder="Price"
+                                                        className="p-2"
+                                                        required
+                                                    />
+                                                    {errors.price && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                            {errors.price}
                                                         </p>
                                                     )}
                                                     <Input

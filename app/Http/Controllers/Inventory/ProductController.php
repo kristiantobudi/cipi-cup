@@ -28,6 +28,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             "sku" => "required|string|max:255",
             "stock" => "required|integer",
+            "price" => "required|integer",
             "min_stock" => "integer",
             "category_id" => "required",
         ]);
@@ -42,6 +43,7 @@ class ProductController extends Controller
             'name' => $validated['name'],
             'sku' => $validated['sku'],
             'stock' => $validated['stock'],
+            'price' => $validated['price'],
             'min_stock' => $validated['min_stock'] ?? null,
             'category_id' => $validated['category_id'],
             'users_id' => Auth::id(),
@@ -57,6 +59,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'sku' => 'required|string|max:255',
             'stock' => 'required|integer',
+            'price' => 'required|integer',
             'min_stock' => 'nullable|integer',
             'category_id' => 'required|exists:categories,id',
         ]);

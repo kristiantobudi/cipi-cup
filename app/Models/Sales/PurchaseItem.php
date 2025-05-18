@@ -13,6 +13,7 @@ class PurchaseItem extends Model
     use HasFactory, SoftDeletes;
     public $incrementing = false;
 
+
     protected static function boot()
     {
         parent::boot();

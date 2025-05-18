@@ -8,6 +8,7 @@ use App\Http\Controllers\Inventory\CategoriesController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\StockController;
 use App\Http\Controllers\Sales\PurchaseController;
+use App\Http\Controllers\Sales\SalesController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -40,6 +41,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
         Route::put('/purchases/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
         Route::delete('/purchases/{purchases}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
+        Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+        Route::get('/sales/create', [SalesController::class, 'create'])->name('sales.create');
+        Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
+        Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
+        Route::put('/sales/{id}', [SalesController::class, 'update'])->name('sales.update');
+        Route::delete('/sales/{sales}', [SalesController::class, 'destroy'])->name('sales.destroy');
     });
 });
 
