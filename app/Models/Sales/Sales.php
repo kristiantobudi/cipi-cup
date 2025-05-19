@@ -2,6 +2,7 @@
 
 namespace App\Models\Sales;
 
+use App\Models\Inventory\Product;
 use App\Models\Sales\SalesItems;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,11 @@ class Sales extends Model
     public function items()
     {
         return $this->hasMany(SalesItems::class, "sales_id");
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 
     protected $fillable = [

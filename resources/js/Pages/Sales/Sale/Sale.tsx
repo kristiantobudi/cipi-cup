@@ -65,13 +65,13 @@ interface Props extends PageProps {
 
 export default function SalesPage() {
     // Show Product
-    const purchases = (usePage().props.purchases ?? []) as {
+    const sales = (usePage().props.sales ?? []) as {
         id: string;
         source: string;
         total_amount: number;
         created_at: string;
     }[];
-    const purchaseSummary = (usePage().props.purchaseSummary ?? {}) as {
+    const saleSummary = (usePage().props.saleSummary ?? {}) as {
         daily: number;
         weekly: number;
         monthly: number;
@@ -96,14 +96,14 @@ export default function SalesPage() {
         const el = scrollRef.current;
         if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
             // Near bottom, load 10 more items
-            setVisibleCount((prev) => Math.min(prev + 10, purchases.length));
+            setVisibleCount((prev) => Math.min(prev + 10, sales.length));
         }
     };
 
     // Reset visibleCount if categories change
     useEffect(() => {
         setVisibleCount(10);
-    }, [purchases]);
+    }, [sales]);
 
     const columns = [
         createSelectionColumn<MetricData>(),
@@ -158,7 +158,7 @@ export default function SalesPage() {
             {
                 label: "View",
                 icon: <Eye className="h-4 w-4" />,
-                href: (data) => route("purchases.show", data.id),
+                href: (data) => route("sales.show", data.id),
             },
             {
                 label: "Edit",
@@ -226,12 +226,12 @@ export default function SalesPage() {
                     <div className="bg-primary-foreground rounded-xl border bg-card text-card-foreground shadow">
                         <div className="flex items-center justify-between">
                             <div className="p-6 text-gray-900 font-bold text-2xl">
-                                Purchases
+                                Penjualan
                             </div>
                             <div className="p-6">
                                 <Button variant="default">
                                     <Link
-                                        href={route("purchases.create")}
+                                        href={route("sales.create")}
                                         className="flex flex-row gap-2"
                                     >
                                         <Plus className="w-5 h-5" />
@@ -243,16 +243,16 @@ export default function SalesPage() {
                     </div>
                     <div className="pt-6">
                         <CustomChart
-                            data={purchases}
+                            data={sales}
                             config={{
                                 total_amount: {
-                                    label: "Total Purchases",
+                                    label: "Total Penjualan",
                                     color: "hsl(var(--chart-1))",
                                 },
                             }}
                             xKey="date"
                             yKeys={["total_amount"]}
-                            summary={purchaseSummary}
+                            summary={saleSummary}
                         />
                     </div>
                     <div className="pt-6">
@@ -266,7 +266,7 @@ export default function SalesPage() {
                             <CardContent className="pt-6">
                                 <DataTable
                                     columns={columns}
-                                    data={purchases as any[]}
+                                    data={sales as any[]}
                                     searchKey="name"
                                     searchPlaceholder="Search metrics..."
                                     exportData={true}

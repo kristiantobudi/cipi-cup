@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inventory\Product;
 use App\Models\Sales\Sales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -15,6 +16,7 @@ class SalesController extends Controller
     public function index()
     {
         $sales = Sales::latest()->get();
+        $product = Product::latest()->get();
 
         $summary = [
             'daily' => Sales::whereDate('date', Carbon::today())->sum('total_amount'),
@@ -31,11 +33,6 @@ class SalesController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render("Sales/Sale/Create");
-    }
-
     public function show($id)
     {
         $sales = Sales::with('items')->findOrFail($id);
@@ -46,6 +43,16 @@ class SalesController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $products = Product::select('id', 'name as product_name', 'price as product_price', 'created_at')->get();
+
+        return Inertia::render('Sales/Sale/Create', [
+            'products' => $products,
+        ]);
+    }
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,6 +62,7 @@ class SalesController extends Controller
             'items.*.product_price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.subtotal' => 'required|numeric|min:0',
+            'items.*.product_id' => 'required|exists:products,id',
         ]);
 
         $validated['date'] = Carbon::parse($validated['date'])->toDateString();
@@ -69,10 +77,12 @@ class SalesController extends Controller
 
             foreach ($validated['items'] as $item) {
                 $sales->items()->create([
+                    'product_id' => $item['product_id'],
                     'product_name' => $item['product_name'],
                     'product_price' => $item['product_price'],
                     'quantity' => $item['quantity'],
-                    'subtotal' => $item['subtotal']
+                    'subtotal' => $item['subtotal'],
+                    'users_id' => Auth::id(),
                 ]);
                 $total += $item['subtotal'];
             }
@@ -80,7 +90,7 @@ class SalesController extends Controller
             $sales->update(['total_amount' => $total]);
         });
 
-        return redirect()->route('sale.index')->with('success', 'Penjualan berhasil disimpan.');
+        return redirect()->route('sales.index')->with('success', 'Penjualan berhasil disimpan.');
     }
 
     public function update(Request $request, $id)
@@ -92,6 +102,7 @@ class SalesController extends Controller
             'items.*.product_price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.subtotal' => 'required|numeric|min:0',
+            'items.*.product_id' => 'required|exists:products,id',
         ]);
 
         DB::transaction(function () use ($validated, $id) {
@@ -117,7 +128,7 @@ class SalesController extends Controller
             $sales->update(['total_amount' => $total]);
         });
 
-        return redirect()->route('sale.index')->with('success', 'Penjualan berhasil diperbarui.');
+        return redirect()->route('sales.index')->with('success', 'Penjualan berhasil diperbarui.');
     }
 
     public function destroy(Request $request, $id)
@@ -125,6 +136,6 @@ class SalesController extends Controller
         $sales = Sales::findOrFail($id);
         $sales->delete();
 
-        return redirect()->route('sale.index')->with('success', 'Penjualan berhasil dihapus.');
+        return redirect()->route('sales.index')->with('success', 'Penjualan berhasil dihapus.');
     }
 }

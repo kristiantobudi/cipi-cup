@@ -23,11 +23,13 @@ class SalesItems extends Model
     }
 
     protected $fillable = [
-        "sales_id",
-        "products_id",
-        "quantity",
-        "price",
-        "subtotal"
+        'product_id',
+        'product_name',
+        'product_price',
+        'quantity',
+        'subtotal',
+        'sales_id',
+        'users_id',
     ];
 
     public function product()

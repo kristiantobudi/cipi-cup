@@ -8,6 +8,7 @@ use App\Models\Inventory\Product;
 use App\Models\Inventory\Categories;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -26,7 +27,6 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            "sku" => "required|string|max:255",
             "stock" => "required|integer",
             "price" => "required|integer",
             "min_stock" => "integer",
@@ -39,9 +39,15 @@ class ProductController extends Controller
 
         $validated = $validator->validated();
 
+        $sku = 'PRD' . Str::upper(Str::slug($validated['name']) . '-' . rand(1000, 9999));
+
+        while (Product::where('sku', $sku)->exists()) {
+            $sku = 'PRD' . Str::upper(Str::slug($validated['name']) . '-' . rand(1000, 9999));
+        }
+
         $product = Product::create([
             'name' => $validated['name'],
-            'sku' => $validated['sku'],
+            'sku' => $sku,
             'stock' => $validated['stock'],
             'price' => $validated['price'],
             'min_stock' => $validated['min_stock'] ?? null,

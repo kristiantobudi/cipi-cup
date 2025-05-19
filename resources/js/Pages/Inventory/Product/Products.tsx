@@ -448,7 +448,7 @@ export default function Products() {
                                                         }
                                                         placeholder="SKU"
                                                         className="p-2"
-                                                        required
+                                                        disabled
                                                     />
                                                     {errors.sku && (
                                                         <p className="text-sm text-red-500 mt-1">

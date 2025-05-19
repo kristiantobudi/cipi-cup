@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('product_id');
-            $table->foreign('product_id')->references('id')->on('product');
+            $table->foreign('product_id')->references('id')->on('products');
             $table->foreignId('users_id')->constrained()->onDelete('cascade');
             $table->string('date')->default(now());
             $table->enum('type', ['in', 'out']);
