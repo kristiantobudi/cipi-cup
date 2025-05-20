@@ -102,13 +102,14 @@ const data = {
             ],
         },
         {
-            title: "Documentation",
+            title: "Reports",
             url: "#",
             icon: BookOpen,
+            isActive: true,
             items: [
                 {
-                    title: "Introduction",
-                    url: "#",
+                    title: "Reports Overview",
+                    url: route("report.index"),
                 },
                 {
                     title: "Get Started",

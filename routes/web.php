@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Inventory\CategoriesController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\StockController;
+use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Sales\PurchaseController;
 use App\Http\Controllers\Sales\SalesController;
 
@@ -47,6 +48,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
         Route::put('/sales/{id}', [SalesController::class, 'update'])->name('sales.update');
         Route::delete('/sales/{sales}', [SalesController::class, 'destroy'])->name('sales.destroy');
+    });
+
+    Route::prefix('/report')->group(function () {
+        Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     });
 });
 

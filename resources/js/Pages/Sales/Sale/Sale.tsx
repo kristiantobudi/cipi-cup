@@ -15,21 +15,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/Components/ui/card";
 import DefaultLayout from "@/Layouts/DefaultLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
-import {
-    Activity,
-    ArrowDownRight,
-    ArrowUpRight,
-    BarChart,
-    Circle,
-    CirclePlus,
-    Edit,
-    Eye,
-    Plug2Icon,
-    Plus,
-    Trash,
-    TrendingUp,
-    Users,
-} from "lucide-react";
+import { Edit, Eye, Plus, Trash } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type MetricData = {
@@ -106,20 +92,10 @@ export default function SalesPage() {
     }, [sales]);
 
     const columns = [
-        createSelectionColumn<MetricData>(),
-        {
-            accessorKey: "source",
-            header: createSortableHeader<MetricData>("Product Name", "source"),
-            cell: ({ row }) => {
-                return (
-                    <div className="font-medium">{row.getValue("source")}</div>
-                );
-            },
-        },
         {
             accessorKey: "total_amount",
             header: createSortableHeader<MetricData>(
-                "Product Name",
+                "Total Penjualan",
                 "total_amount",
             ),
             cell: ({ row }) => {
@@ -139,7 +115,7 @@ export default function SalesPage() {
         },
         {
             accessorKey: "created_at",
-            header: "Tanggal Pembuatan",
+            header: "Tanggal Penjualan",
             cell: ({ row }) => {
                 const rawDate = row.getValue("created_at") as string;
                 const formattedDate = new Date(rawDate).toLocaleDateString(
